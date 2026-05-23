@@ -203,5 +203,5 @@ if st.button('Predecir Pit Stop'):
 
 st.warning(
     f'El modelo ({nombre_modelo}) '
-    f'tiene un ROC-AUC aproximado de 0.92 en datos de prueba.'
+    f'tiene un ROC-AUC aproximado de 0.9 en datos de prueba.'
 )
