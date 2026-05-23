@@ -18,6 +18,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import pickle
+import streamlit as st
 from huggingface_hub import hf_hub_download
 
 def cargar_modelo():
