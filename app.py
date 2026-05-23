@@ -35,30 +35,6 @@ modelo, min_max_scaler, variables, compound_map, necesita_norm, nombre_modelo = 
 #data_futuros = pd.read_csv('f1_datos_futuros.csv')
 #data_futuros.head()
 
-import streamlit as st
-import pandas as pd
-import joblib
-
-from huggingface_hub import hf_hub_download
-
-# =========================
-# CARGAR MODELO DESDE HUGGING FACE
-# =========================
-
-@st.cache_resource
-def cargar_modelo():
-
-    ruta_modelo = hf_hub_download(
-        repo_id="CarlosC4/modelo-despliegue-f1",
-        filename="modelo.pkl"   # <- el nombre EXACTO del archivo subido
-    )
-
-    modelo = joblib.load(ruta_modelo)
-
-    return modelo
-
-modelo = cargar_modelo()
-
 # =========================
 # INTERFAZ STREAMLIT
 # =========================
