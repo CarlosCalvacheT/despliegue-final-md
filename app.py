@@ -1,8 +1,75 @@
-
 import pandas as pd
+import numpy as np
 import pickle
 import streamlit as st
 from huggingface_hub import hf_hub_download
+from sklearn.base import BaseEstimator, TransformerMixin
+from sklearn.preprocessing import MinMaxScaler
+ 
+# ── Clases del pipeline (deben estar aquí para que pickle pueda cargarlas) ─────
+ 
+class LapTimeCleaner(BaseEstimator, TransformerMixin):
+    def __init__(self, threshold=150.0):
+        self.threshold = threshold
+ 
+    def fit(self, X, y=None):
+        X_ = X.copy()
+        if 'Race' in X_.columns:
+            self.global_median_ = X_.groupby('Race')['LapTime (s)'].median().mean()
+        else:
+            self.global_median_ = X_['LapTime (s)'].median()
+        return self
+ 
+    def transform(self, X, y=None):
+        X_ = X.copy()
+        mask = X_['LapTime (s)'] > self.threshold
+        if mask.any():
+            if 'Race' in X_.columns:
+                mediana_por_carrera = X_.groupby('Race')['LapTime (s)'].transform('median')
+                X_.loc[mask, 'LapTime (s)'] = mediana_por_carrera[mask]
+            else:
+                X_.loc[mask, 'LapTime (s)'] = self.global_median_
+        return X_
+ 
+ 
+class FeatureEngineer(BaseEstimator, TransformerMixin):
+    COMPOUND_MAP = {
+        'SOFT': 3,
+        'MEDIUM': 2,
+        'HARD': 1,
+        'INTERMEDIATE': 1.5,
+        'WET': 1.5
+    }
+    MAX_TYRE_LIFE = 58.0
+ 
+    def fit(self, X, y=None):
+        return self
+ 
+    def transform(self, X, y=None):
+        X_ = X.copy()
+        if X_['Compound'].dtype == object:
+            X_['Compound'] = X_['Compound'].map(self.COMPOUND_MAP).fillna(2)
+        X_['Normalized_TyreLife'] = (X_['TyreLife'] / self.MAX_TYRE_LIFE).round(4)
+        if 'LapTime_Delta' not in X_.columns:
+            X_['LapTime_Delta'] = X_['LapTime (s)'].diff().fillna(0)
+        if 'Position_Change' not in X_.columns:
+            X_['Position_Change'] = X_['Position'].diff().fillna(0)
+        return X_
+ 
+ 
+class ColumnSelector(BaseEstimator, TransformerMixin):
+    VARIABLES_MODELO = [
+        'Compound', 'Stint', 'TyreLife', 'Position', 'LapTime (s)',
+        'LapTime_Delta', 'Cumulative_Degradation', 'RaceProgress',
+        'Normalized_TyreLife', 'Position_Change'
+    ]
+ 
+    def fit(self, X, y=None):
+        return self
+ 
+    def transform(self, X, y=None):
+        return X.reindex(columns=self.VARIABLES_MODELO, fill_value=0)
+ 
  
 # ── Configuración de la página ─────────────────────────────────────────────────
 st.set_page_config(
@@ -18,14 +85,11 @@ st.markdown(
 )
  
 # ── Carga del pipeline desde Hugging Face ──────────────────────────────────────
-# @st.cache_resource garantiza que la descarga ocurre UNA SOLA VEZ
-# y el pipeline queda en memoria para todas las sesiones siguientes.
-# Esto es clave cuando el modelo es pesado.
 @st.cache_resource
 def cargar_pipeline():
     ruta = hf_hub_download(
-        repo_id="CarlosC4/modelo-despliegue-f1",   # <-- cambia por tu repo
-        filename="pipeline_f1.pkl"                  # el pipeline completo
+        repo_id="CarlosC4/modelo-despliegue-f1",
+        filename="pipeline_f1.pkl"
     )
     return pickle.load(open(ruta, "rb"))
  
@@ -53,8 +117,6 @@ with col2:
     Position_Change = st.slider("Cambio de posición", -5, 5, 0)
  
 # ── Construcción del DataFrame ─────────────────────────────────────────────────
-# Compound llega como STRING — el pipeline lo codifica internamente.
-# Ya no necesitas compound_map, min_max_scaler ni necesita_norm por separado.
 dato = pd.DataFrame([{
     "Compound":               Compound,
     "Stint":                  Stint,
@@ -86,7 +148,6 @@ if st.button("🔍 Predecir Pit Stop", use_container_width=True):
             f"Probabilidad de pit stop: **{probabilidad:.1%}**"
         )
  
-    # Barra de probabilidad visual
     st.progress(probabilidad, text=f"Confianza del modelo: {probabilidad:.1%}")
  
 st.divider()
@@ -94,3 +155,4 @@ st.warning(
     "ℹ️ El modelo tiene un ROC-AUC aproximado de 0.92 en datos de prueba. "
     "Úsalo como apoyo a la decisión, no como regla absoluta."
 )
+ 
