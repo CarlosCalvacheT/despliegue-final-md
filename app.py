@@ -26,8 +26,7 @@ st.markdown(
     'Ingresa los datos de la vuelta actual para predecir '
     'si el piloto hará pit stop en la siguiente vuelta.'
 )
-import sklearn
-st.write(sklearn.__version__)
+
 # Entradas del usuario
 Compound = st.selectbox('Compuesto de Neumático',
     ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'])
