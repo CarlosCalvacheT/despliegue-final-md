@@ -152,6 +152,6 @@ if st.button("🔍 Predecir Pit Stop", use_container_width=True):
  
 st.divider()
 st.warning(
-    "ℹ️ El modelo tiene un ROC-AUC aproximado de 0.92 en datos de prueba. "
+    "ℹ️ El modelo tiene un ROC-AUC aproximado de 94.99% en datos de prueba. "
     "Úsalo como apoyo a la decisión, no como regla absoluta."
 )
