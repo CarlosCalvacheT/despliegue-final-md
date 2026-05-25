@@ -1,6 +1,8 @@
 pandas
 numpy
 matplotlib
-scikit-learn==1.8.0
+scikit-learn==1.6.1
+scikit-optimize
 joblib
 huggingface_hub
+imbalanced-learn
