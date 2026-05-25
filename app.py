@@ -6,7 +6,7 @@ from huggingface_hub import hf_hub_download
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.preprocessing import MinMaxScaler
  
-# ── Clases del pipeline (deben estar aquí para que pickle pueda cargarlas) ─────
+# ── Clases del pipeline ────────────────────────────────────────────────────────
  
 class LapTimeCleaner(BaseEstimator, TransformerMixin):
     def __init__(self, threshold=150.0):
@@ -34,11 +34,8 @@ class LapTimeCleaner(BaseEstimator, TransformerMixin):
  
 class FeatureEngineer(BaseEstimator, TransformerMixin):
     COMPOUND_MAP = {
-        'SOFT': 3,
-        'MEDIUM': 2,
-        'HARD': 1,
-        'INTERMEDIATE': 1.5,
-        'WET': 1.5
+        'SOFT': 3, 'MEDIUM': 2, 'HARD': 1,
+        'INTERMEDIATE': 1.5, 'WET': 1.5
     }
     MAX_TYRE_LIFE = 58.0
  
@@ -72,17 +69,10 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
  
  
 # ── Configuración de la página ─────────────────────────────────────────────────
-st.set_page_config(
-    page_title="F1 Pit Stop Predictor",
-    page_icon="🏎️",
-    layout="centered"
-)
+st.set_page_config(page_title="F1 Pit Stop Predictor", page_icon="🏎️", layout="centered")
  
 st.title("🏎️ Predicción de Pit Stop en Fórmula 1")
-st.markdown(
-    "Ingresa los datos de la vuelta actual para predecir "
-    "si el piloto hará pit stop en la siguiente vuelta."
-)
+st.markdown("Ingresa los datos de la vuelta actual para predecir si el piloto hará pit stop.")
  
 # ── Carga del pipeline desde Hugging Face ──────────────────────────────────────
 @st.cache_resource
@@ -91,9 +81,26 @@ def cargar_pipeline():
         repo_id="CarlosC4/modelo-despliegue-f1",
         filename="pipeline_f1.pkl"
     )
-    return pickle.load(open(ruta, "rb"))
+    pipeline = pickle.load(open(ruta, "rb"))
  
-pipeline = cargar_pipeline()
+    # Extraemos los pasos por separado para evitar incompatibilidades
+    # entre la versión de sklearn de Colab y la de Streamlit Cloud
+    preprocessor = pipeline.named_steps['preprocessor']  # el pipe_prep
+    modelo        = pipeline.named_steps['model']
+ 
+    # El scaler viene dentro del preprocessor
+    scaler = preprocessor.named_steps['scaler']
+ 
+    # Los transformadores anteriores al scaler
+    pasos_previos = [
+        preprocessor.named_steps['lap_cleaner'],
+        preprocessor.named_steps['feature_engineer'],
+        preprocessor.named_steps['col_selector'],
+    ]
+ 
+    return pasos_previos, scaler, modelo
+ 
+pasos_previos, scaler, modelo = cargar_pipeline()
  
 # ── Entradas del usuario ───────────────────────────────────────────────────────
 st.subheader("Datos de la vuelta actual")
@@ -101,10 +108,7 @@ st.subheader("Datos de la vuelta actual")
 col1, col2 = st.columns(2)
  
 with col1:
-    Compound = st.selectbox(
-        "Compuesto de Neumático",
-        ["SOFT", "MEDIUM", "HARD", "INTERMEDIATE", "WET"]
-    )
+    Compound = st.selectbox("Compuesto de Neumático", ["SOFT", "MEDIUM", "HARD", "INTERMEDIATE", "WET"])
     Stint = st.slider("Stint (número de stint)", 1, 6, 2)
     TyreLife = st.slider("Vida del Neumático (vueltas)", 1, 60, 15)
     Position = st.slider("Posición en carrera", 1, 20, 8)
@@ -132,26 +136,28 @@ dato = pd.DataFrame([{
  
 # ── Predicción ─────────────────────────────────────────────────────────────────
 if st.button("🔍 Predecir Pit Stop", use_container_width=True):
-    prediccion   = pipeline.predict(dato)[0]
-    probabilidad = pipeline.predict_proba(dato)[0][1]
+ 
+    # Aplicamos los transformadores uno a uno
+    X = dato.copy()
+    for paso in pasos_previos:
+        X = paso.transform(X)
+ 
+    # Aplicamos el scaler usando numpy directamente (evita el problema de versiones)
+    X_array = np.array(X, dtype=float)
+    X_scaled = scaler.transform(X_array)
+ 
+    # Predicción con el modelo
+    prediccion   = modelo.predict(X_scaled)[0]
+    probabilidad = modelo.predict_proba(X_scaled)[0][1]
  
     st.divider()
  
     if prediccion == 1:
-        st.error(
-            f"🔴 **PIT STOP RECOMENDADO**\n\n"
-            f"Probabilidad: **{probabilidad:.1%}**"
-        )
+        st.error(f"🔴 **PIT STOP RECOMENDADO**\n\nProbabilidad: **{probabilidad:.1%}**")
     else:
-        st.success(
-            f"🟢 **CONTINUAR EN PISTA**\n\n"
-            f"Probabilidad de pit stop: **{probabilidad:.1%}**"
-        )
+        st.success(f"🟢 **CONTINUAR EN PISTA**\n\nProbabilidad de pit stop: **{probabilidad:.1%}**")
  
     st.progress(probabilidad, text=f"Confianza del modelo: {probabilidad:.1%}")
  
 st.divider()
-st.warning(
-    "ℹ️ El modelo tiene un ROC-AUC aproximado de 94.99% en datos de prueba. "
-    "Úsalo como apoyo a la decisión, no como regla absoluta."
-)
+st.warning("ℹ️ El modelo tiene un ROC-AUC aproximado de 94.99% en datos de prueba.")
