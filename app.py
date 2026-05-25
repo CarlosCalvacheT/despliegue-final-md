@@ -68,7 +68,7 @@ class ColumnSelector(BaseEstimator, TransformerMixin):
         return self
  
     def transform(self, X, y=None):
-        return X.reindex(columns=self.VARIABLES_MODELO, fill_value=0)
+        return X.reindex(columns=self.VARIABLES_MODELO, fill_value=0).astype(float)
  
  
 # ── Configuración de la página ─────────────────────────────────────────────────
@@ -152,7 +152,6 @@ if st.button("🔍 Predecir Pit Stop", use_container_width=True):
  
 st.divider()
 st.warning(
-    "ℹ️ El modelo tiene un ROC-AUC aproximado de 0.94.99 en datos de prueba. "
+    "ℹ️ El modelo tiene un ROC-AUC aproximado de 0.92 en datos de prueba. "
     "Úsalo como apoyo a la decisión, no como regla absoluta."
 )
- 
