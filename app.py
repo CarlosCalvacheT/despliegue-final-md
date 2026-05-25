@@ -19,13 +19,15 @@ import numpy as np
 import pickle
 from huggingface_hub import hf_hub_download
 
+
 import streamlit as st
 st.title('🏎️ Predicción de Pit Stop en Fórmula 1')
 st.markdown(
     'Ingresa los datos de la vuelta actual para predecir '
     'si el piloto hará pit stop en la siguiente vuelta.'
 )
-
+import sklearn
+st.write(sklearn.__version__)
 # Entradas del usuario
 Compound = st.selectbox('Compuesto de Neumático',
     ['SOFT', 'MEDIUM', 'HARD', 'INTERMEDIATE', 'WET'])
