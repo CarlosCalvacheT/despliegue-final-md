@@ -76,7 +76,7 @@ st.markdown("Ingresa los datos de la vuelta actual para predecir si el piloto ha
  
 # ── Carga del pipeline desde Hugging Face ──────────────────────────────────────
 @st.cache_resource
-def cargar_pipeline():
+def cargar_artefactos():
     ruta = hf_hub_download(
         repo_id="CarlosC4/modelo-despliegue-f1",
         filename="pipeline_f1.pkl"
