@@ -85,7 +85,6 @@ if st.button("🔍 Predecir Pit Stop", use_container_width=True):
     else:
         st.success(f"🟢 **CONTINUAR EN PISTA**\n\nProbabilidad de pit stop: **{probabilidad:.1%}**")
  
-    st.progress(probabilidad, text=f"Confianza del modelo: {probabilidad:.1%}")
  
 st.divider()
-st.warning("ℹ️ El modelo tiene un ROC-AUC aproximado de 94.99% en datos de prueba.")
+st.warning("ℹ️ El modelo presento una precisión 71% en datos de prueba.")
