@@ -93,7 +93,7 @@ with tab1:
     st.markdown('<div class="section-label">⬡ Configuración de Neumático</div>', unsafe_allow_html=True)
     c1, c2, c3 = st.columns(3)
     with c1: Compound = st.selectbox("Compuesto", ["SOFT","MEDIUM","HARD","INTERMEDIATE","WET"])
-    with c2: Stint    = st.slider("Stint #", 1, 6, 2)
+    with c2: Stint    = st.slider("Stint (Periodo de vueltas que recorre un piloto)", 1, 6, 2)
     with c3: TyreLife = st.slider("Vueltas en neumático", 1, 60, 15)
  
     st.markdown('<div class="section-label">⬡ Estado en Carrera</div>', unsafe_allow_html=True)
