@@ -364,7 +364,7 @@ st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("---")
 st.markdown(
     '<p style="text-align:center; color:#444; font-size:0.75rem; font-family:\'Rajdhani\',sans-serif; letter-spacing:0.1em">'
-    'MODELO · PRECISIÓN 71% · DATOS DE PRUEBA · APOYO A DECISIÓN ESTRATÉGICA'
+    'MODELO CON UNA PRECISIÓN DEL 71% CON DATOS DE PRUEBA · APOYO A DECISIÓN ESTRATÉGICA'
     '</p>',
     unsafe_allow_html=True
 )
