@@ -239,9 +239,9 @@ col1, col2, col3 = st.columns(3)
 with col1:
     Compound = st.selectbox("Compuesto", ["SOFT", "MEDIUM", "HARD", "INTERMEDIATE", "WET"])
 with col2:
-    Stint    = st.slider("Stint #", 1, 6, 2)
+    Stint    = st.slider("Stint (Periodo de vueltas que recorre un piloto)", 1, 6, 2)
 with col3:
-    TyreLife = st.slider("Vueltas en neumático", 1, 60, 15)
+    TyreLife = st.slider("Vuelta del neumático", 1, 60, 15)
  
 st.markdown('<div class="section-label" style="margin-top:1rem">⬡ Estado en Carrera</div>', unsafe_allow_html=True)
  
