@@ -40,10 +40,10 @@ html, body, [class*="css"] { font-family: 'Rajdhani', sans-serif; background-col
 hr { border-color:rgba(255,24,1,0.2)!important; }
 
 /* ── Centrado del contenido de las pestañas ── */
-.tab-content {
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 1rem;
+.stTabs [data-baseweb="tab-panel"] > div > div {
+    max-width: 1100px;
+    margin-left: auto;
+    margin-right: auto;
 }
 </style>
 """, unsafe_allow_html=True)
