@@ -446,4 +446,4 @@ with st.sidebar:
         st.markdown('<p style="color:#444; font-size:0.8rem">Las predicciones que hagas aparecerán aquí.</p>', unsafe_allow_html=True)
  
     st.markdown("<br>", unsafe_allow_html=True)
-    st.markdown('<p style="color:#333; font-size:0.7rem; text-align:center; font-family:Rajdhani,sans-serif; letter-spacing:0.1em">MODELO · PRECISIÓN 71%<br>ROC-AUC 0.92 · APOYO ESTRATÉGICO</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#050505; font-size:0.7rem; text-align:center; font-family:Rajdhani,sans-serif; letter-spacing:0.1em">MODELO CON UNA PRECISIÓN DEL 71% CON DATOS DE PRUEBA · APOYO A DECISIÓN ESTRATÉGICA</p>', unsafe_allow_html=True)
