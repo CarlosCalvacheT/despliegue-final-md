@@ -138,7 +138,7 @@ despliegue-final-md/
 ├── app.py
 ├── informe_Final_F1.pdf
 └── requirements.txt
-
+...
 ---
 
 ## 📦 Librerías principales
