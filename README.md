@@ -127,18 +127,17 @@ streamlit run app.py
 ---
 
 ## 📁 Estructura del repositorio
+```text
 despliegue-final-md/
+├── .devcontainer/
+├── .python-version
+├── 01_Preparacion_Datos.ipynb
+├── 02_Modelamiento_Evaluacion.ipynb
+├── 03_Despliegue_Streamlit_Pipeline.ipynb
+├── README.md
 ├── app.py
-├── requirements.txt
-├── pipeline_modelo_f1.pkl
-├── notebooks/
-│   ├── 01_Preparacion_Datos.ipynb
-│   ├── 02_Modelamiento_Evaluacion.ipynb
-│   └── 03_Despliegue_Streamlit.ipynb
-├── informe/
-│   └── Informe_Final_F1_PitStop.pdf
-└── datos/
-└── dataset_f1.csv
+├── informe_Final_F1.pdf
+└── requirements.txt
 
 ---
 
